@@ -88,22 +88,3 @@ The control panel updates a shared drain configuration. That configuration is
 used to rebuild the Three.js geometry shown in the viewport. When the user
 downloads the model, the same parameters are converted into a watertight
 triangle mesh and encoded as a binary STL file entirely in the browser.
-
-## Project Structure
-
-```text
-.
-├── .github/workflows/   # GitHub Pages deployment
-├── public/              # Static assets copied directly into the build
-│   └── demo.png
-├── src/
-│   ├── app/             # Application shell, styles, and internationalization
-│   ├── features/
-│   │   └── configurator/
-│   │       ├── components/  # Controls and 3D viewport
-│   │       ├── domain/      # Configuration, geometry, and STL generation
-│   │       └── hooks/       # React and Three.js integration
-│   └── main.tsx
-├── index.html
-└── vite.config.ts
-```
