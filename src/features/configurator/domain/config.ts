@@ -69,13 +69,21 @@ export const cavityControl: ControlDefinition = {
   format: (value) => `${value} × ${value}`,
 };
 
+export function getMaxCornerRadius(
+  size: number,
+  border: number,
+): number {
+  return Math.max(0, Math.min(border, size / 2 - 0.1));
+}
+
 export function getSafeConfig(config: DrainConfig): DrainConfig {
   const maxBorder = Math.max(2, config.size / 2 - 1);
-  const maxRadius = Math.max(0, config.size / 2 - 0.1);
+  const border = Math.min(config.border, maxBorder);
+  const maxRadius = getMaxCornerRadius(config.size, border);
 
   return {
     ...config,
-    border: Math.min(config.border, maxBorder),
+    border,
     cornerRadius: Math.min(config.cornerRadius, maxRadius),
   };
 }

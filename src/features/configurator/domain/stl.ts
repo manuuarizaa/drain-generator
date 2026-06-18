@@ -135,10 +135,7 @@ export function encodeBinaryStl(triangles: readonly Triangle[]) {
 export function createStlModel(rawConfig: DrainConfig): StlModel {
   const config = getSafeConfig(rawConfig)
   const innerWidth = config.size - 2 * config.border
-  const outer = createRoundedOutline(
-    config.size,
-    Math.min(config.cornerRadius, config.size / 2 - 0.01),
-  )
+  const outer = createRoundedOutline(config.size, config.cornerRadius)
   const edgeMargin = Math.max(2, innerWidth * 0.012)
   const holeSize = Math.max(
     2,

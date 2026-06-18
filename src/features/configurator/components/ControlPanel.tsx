@@ -5,6 +5,8 @@ import {
   cavityControl,
   cavityShapes,
   dimensionControls,
+  getMaxCornerRadius,
+  getSafeConfig,
 } from "../domain/config";
 import type {
   CavityShape,
@@ -35,7 +37,7 @@ export function ControlPanel({
   const { t } = useI18n();
 
   const updateNumber = (key: NumericConfigKey, value: number) => {
-    setConfig((current) => ({ ...current, [key]: value }));
+    setConfig((current) => getSafeConfig({ ...current, [key]: value }));
   };
 
   const updateShape = (shape: CavityShape) => {
@@ -55,15 +57,25 @@ export function ControlPanel({
         <div className="section-heading">
           <h2 id="dimensions-title">{t("section.dimensions")}</h2>
         </div>
-        {dimensionControls.map((control) => (
-          <RangeControl
-            key={control.key}
-            control={control}
-            label={t(`controls.${control.key}` as TranslationKey)}
-            value={config[control.key]}
-            onChange={(value) => updateNumber(control.key, value)}
-          />
-        ))}
+        {dimensionControls.map((control) => {
+          const effectiveControl =
+            control.key === "cornerRadius"
+              ? {
+                  ...control,
+                  max: getMaxCornerRadius(config.size, config.border),
+                }
+              : control;
+
+          return (
+            <RangeControl
+              key={control.key}
+              control={effectiveControl}
+              label={t(`controls.${control.key}` as TranslationKey)}
+              value={config[control.key]}
+              onChange={(value) => updateNumber(control.key, value)}
+            />
+          );
+        })}
       </section>
 
       <section className="control-section" aria-labelledby="pattern-title">

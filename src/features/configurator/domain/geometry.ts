@@ -144,11 +144,8 @@ export function createDrainModel(
   const config = getSafeConfig(rawConfig);
   const width = config.size * VISUAL_SCALE;
   const visualHeight = config.height * VISUAL_SCALE * HEIGHT_EMPHASIS;
-  const border = Math.min(config.border * VISUAL_SCALE, width / 2 - 0.1);
-  const cornerRadius = Math.min(
-    config.cornerRadius * VISUAL_SCALE,
-    width / 2 - 0.01,
-  );
+  const border = config.border * VISUAL_SCALE;
+  const cornerRadius = config.cornerRadius * VISUAL_SCALE;
   const innerWidth = width - 2 * border;
   const bevel = Math.min(0.07, visualHeight * 0.08);
   const group = new Group();
