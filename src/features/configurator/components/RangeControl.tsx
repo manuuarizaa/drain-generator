@@ -1,10 +1,10 @@
-import type { ControlDefinition } from '../domain/config'
+import type { ControlDefinition } from "../domain/config";
 
 interface RangeControlProps {
-  control: ControlDefinition
-  label: string
-  value: number
-  onChange: (value: number) => void
+  control: ControlDefinition;
+  label: string;
+  value: number;
+  onChange: (value: number) => void;
 }
 
 export function RangeControl({
@@ -13,7 +13,7 @@ export function RangeControl({
   value,
   onChange,
 }: RangeControlProps) {
-  const progress = ((value - control.min) / (control.max - control.min)) * 100
+  const progress = ((value - control.min) / (control.max - control.min)) * 100;
 
   return (
     <label className="range-control">
@@ -28,9 +28,9 @@ export function RangeControl({
         step={control.step}
         value={value}
         aria-label={label}
-        style={{ '--range-progress': `${progress}%` } as React.CSSProperties}
+        style={{ "--range-progress": `${progress}%` } as React.CSSProperties}
         onChange={(event) => onChange(event.currentTarget.valueAsNumber)}
       />
     </label>
-  )
+  );
 }

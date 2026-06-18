@@ -1,11 +1,4 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-  type ReactNode,
-} from "react";
+import { readStorage } from "../shared/browser/storage";
 
 export const supportedLocales = ["es", "en"] as const;
 
@@ -32,13 +25,27 @@ const es = {
   "shape.rounded": "Suavizada",
   "shape.round": "Redonda",
   "export.generating": "Generando…",
+  "export.generatingStatus": "Preparando el archivo STL.",
   "export.download": "Descargar STL",
+  "export.error": "No se pudo generar el STL. Inténtalo de nuevo.",
   "viewport.ariaLabel":
     "Vista 3D de un sumidero de {size} por {size} milímetros",
   "viewport.drag": "Arrastrar",
   "viewport.rotate": "para rotar",
   "viewport.scroll": "Scroll",
   "viewport.zoom": "para ampliar",
+  "viewport.controls": "Controles de la vista 3D",
+  "viewport.rotateLeft": "Rotar a la izquierda",
+  "viewport.rotateRight": "Rotar a la derecha",
+  "viewport.zoomIn": "Acercar",
+  "viewport.zoomOut": "Alejar",
+  "viewport.reset": "Restablecer vista",
+  "viewport.pause": "Pausar rotación",
+  "viewport.resume": "Reanudar rotación",
+  "viewport.keyboard":
+    "Usa las flechas para rotar, más y menos para ampliar, inicio para restablecer y espacio para pausar.",
+  "viewport.webglError":
+    "La vista 3D no está disponible porque el navegador no pudo iniciar WebGL.",
   "errors.rootNotFound": "No se encontró el elemento raíz de la aplicación.",
   "errors.i18nProviderMissing":
     "useI18n debe utilizarse dentro de I18nProvider.",
@@ -67,12 +74,26 @@ const en: Record<TranslationKey, string> = {
   "shape.rounded": "Rounded",
   "shape.round": "Round",
   "export.generating": "Generating…",
+  "export.generatingStatus": "Preparing the STL file.",
   "export.download": "Download STL",
+  "export.error": "The STL could not be generated. Please try again.",
   "viewport.ariaLabel": "3D view of a {size} by {size} millimeter drain",
   "viewport.drag": "Drag",
   "viewport.rotate": "to rotate",
   "viewport.scroll": "Scroll",
   "viewport.zoom": "to zoom",
+  "viewport.controls": "3D view controls",
+  "viewport.rotateLeft": "Rotate left",
+  "viewport.rotateRight": "Rotate right",
+  "viewport.zoomIn": "Zoom in",
+  "viewport.zoomOut": "Zoom out",
+  "viewport.reset": "Reset view",
+  "viewport.pause": "Pause rotation",
+  "viewport.resume": "Resume rotation",
+  "viewport.keyboard":
+    "Use arrow keys to rotate, plus and minus to zoom, Home to reset, and Space to pause.",
+  "viewport.webglError":
+    "The 3D preview is unavailable because the browser could not start WebGL.",
   "errors.rootNotFound": "The application root element was not found.",
   "errors.i18nProviderMissing": "useI18n must be used inside I18nProvider.",
 };
@@ -81,18 +102,13 @@ const messages: Record<Locale, Record<TranslationKey, string>> = { es, en };
 const storageKey = "sumidero-locale";
 
 type InterpolationValues = Record<string, string | number>;
-type Translate = (key: TranslationKey, values?: InterpolationValues) => string;
-
-interface I18nContextValue {
-  locale: Locale;
-  setLocale: (locale: Locale) => void;
-  t: Translate;
-}
-
-const I18nContext = createContext<I18nContextValue | null>(null);
+export type Translate = (
+  key: TranslationKey,
+  values?: InterpolationValues,
+) => string;
 
 export function getPreferredLocale(): Locale {
-  const savedLocale = window.localStorage.getItem(storageKey);
+  const savedLocale = readStorage(storageKey);
 
   if (savedLocale === "es" || savedLocale === "en") {
     return savedLocale;
@@ -117,37 +133,4 @@ export function translate(
   );
 }
 
-export function I18nProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocale] = useState<Locale>(getPreferredLocale);
-
-  useEffect(() => {
-    const description = document.querySelector<HTMLMetaElement>(
-      'meta[name="description"]',
-    );
-
-    document.documentElement.lang = locale;
-    document.title = translate(locale, "meta.title");
-    description?.setAttribute("content", translate(locale, "meta.description"));
-    window.localStorage.setItem(storageKey, locale);
-  }, [locale]);
-
-  const value = useMemo<I18nContextValue>(() => {
-    const t: Translate = (key, values) => translate(locale, key, values);
-
-    return { locale, setLocale, t };
-  }, [locale]);
-
-  return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
-}
-
-export function useI18n() {
-  const context = useContext(I18nContext);
-
-  if (!context) {
-    throw new Error(
-      translate(getPreferredLocale(), "errors.i18nProviderMissing"),
-    );
-  }
-
-  return context;
-}
+export { storageKey };

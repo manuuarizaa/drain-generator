@@ -1,48 +1,26 @@
-import type { Dispatch, SetStateAction } from "react";
 import { LanguageSelector } from "../../../app/LanguageSelector";
-import { useI18n, type TranslationKey } from "../../../app/i18n";
-import {
-  cavityControl,
-  cavityShapes,
-  dimensionControls,
-  getMaxCornerRadius,
-  getSafeConfig,
-} from "../domain/config";
-import type {
-  CavityShape,
-  DrainConfig,
-  NumericConfigKey,
-} from "../domain/config";
-import { RangeControl } from "./RangeControl";
-
-const shapeIcons: Record<CavityShape, string> = {
-  square: "□",
-  rounded: "▢",
-  round: "○",
-};
+import { useI18n } from "../../../app/useI18n";
+import type { DrainConfig } from "../domain/config";
+import type { DrainConfiguratorActions } from "../hooks/useDrainConfigurator";
+import { DimensionsSection } from "./DimensionsSection";
+import { PatternSection } from "./PatternSection";
 
 interface ControlPanelProps {
   config: DrainConfig;
-  setConfig: Dispatch<SetStateAction<DrainConfig>>;
+  actions: DrainConfiguratorActions;
   isExporting: boolean;
+  exportError: unknown;
   onExport: () => void;
 }
 
 export function ControlPanel({
   config,
-  setConfig,
+  actions,
   isExporting,
+  exportError,
   onExport,
 }: ControlPanelProps) {
   const { t } = useI18n();
-
-  const updateNumber = (key: NumericConfigKey, value: number) => {
-    setConfig((current) => getSafeConfig({ ...current, [key]: value }));
-  };
-
-  const updateShape = (shape: CavityShape) => {
-    setConfig((current) => ({ ...current, shape }));
-  };
 
   return (
     <aside className="control-panel" aria-label={t("panel.ariaLabel")}>
@@ -53,63 +31,15 @@ export function ControlPanel({
         <LanguageSelector />
       </header>
 
-      <section className="control-section" aria-labelledby="dimensions-title">
-        <div className="section-heading">
-          <h2 id="dimensions-title">{t("section.dimensions")}</h2>
-        </div>
-        {dimensionControls.map((control) => {
-          const effectiveControl =
-            control.key === "cornerRadius"
-              ? {
-                  ...control,
-                  max: getMaxCornerRadius(config.size, config.border),
-                }
-              : control;
-
-          return (
-            <RangeControl
-              key={control.key}
-              control={effectiveControl}
-              label={t(`controls.${control.key}` as TranslationKey)}
-              value={config[control.key]}
-              onChange={(value) => updateNumber(control.key, value)}
-            />
-          );
-        })}
-      </section>
-
-      <section className="control-section" aria-labelledby="pattern-title">
-        <div className="section-heading">
-          <h2 id="pattern-title">{t("section.pattern")}</h2>
-        </div>
-        <RangeControl
-          control={cavityControl}
-          label={t("controls.cavities")}
-          value={config.cavities}
-          onChange={(value) => updateNumber("cavities", value)}
-        />
-        <fieldset className="shape-fieldset">
-          <legend>{t("shape.legend")}</legend>
-          <div className="shape-options">
-            {cavityShapes.map((shape) => (
-              <button
-                key={shape}
-                type="button"
-                className={
-                  config.shape === shape
-                    ? "shape-button is-active"
-                    : "shape-button"
-                }
-                aria-pressed={config.shape === shape}
-                onClick={() => updateShape(shape)}
-              >
-                <span aria-hidden="true">{shapeIcons[shape]}</span>
-                {t(`shape.${shape}`)}
-              </button>
-            ))}
-          </div>
-        </fieldset>
-      </section>
+      <DimensionsSection
+        config={config}
+        onDimensionChange={actions.changeDimension}
+      />
+      <PatternSection
+        config={config}
+        onCavitiesChange={(value) => actions.changeDimension("cavities", value)}
+        onShapeChange={actions.changeShape}
+      />
 
       <footer className="panel-footer">
         <button
@@ -123,6 +53,13 @@ export function ControlPanel({
           </span>
           <span aria-hidden="true">↘</span>
         </button>
+        {exportError ? (
+          <p role="alert">{t("export.error")}</p>
+        ) : (
+          <p aria-live="polite">
+            {isExporting ? t("export.generatingStatus") : ""}
+          </p>
+        )}
       </footer>
     </aside>
   );

@@ -1,5 +1,5 @@
 {
-  "name": "sumidero-playground",
+  "name": "drain-generator",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -8,8 +8,14 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "typecheck": "tsc -b --pretty false",
+    "lint": "eslint . --max-warnings 0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "test": "vitest run",
-    "validate": "pnpm typecheck && pnpm test && pnpm build"
+    "test:coverage": "vitest run --coverage",
+    "doctor": "react-doctor . --yes --blocking error",
+    "react:doctor": "react-doctor . --yes --blocking error",
+    "validate": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test:coverage && pnpm run doctor && pnpm build"
   },
   "dependencies": {
     "earcut": "^3.0.2",
@@ -18,14 +24,26 @@
     "three": "^0.184.0"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/earcut": "^3.0.0",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@types/three": "^0.184.1",
     "@vitejs/plugin-react": "^6.0.2",
+    "@vitest/coverage-v8": "^4.1.9",
+    "eslint": "^10.5.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.3",
+    "globals": "^17.6.0",
+    "prettier": "^3.8.4",
+    "react-doctor": "^0.5.6",
     "typescript": "^6.0.3",
+    "typescript-eslint": "^8.61.1",
     "vite": "^8.0.16",
     "vitest": "^4.1.9"
   },
-  "packageManager": "pnpm@10.30.0"
+  "packageManager": "pnpm@10.30.0",
+  "engines": {
+    "node": "^20.19.0 || >=22.13.0"
+  }
 }

@@ -1,6 +1,8 @@
 import type { DrainConfig } from "../domain/config";
-import { useI18n } from "../../../app/i18n";
+import { useI18n } from "../../../app/useI18n";
 import { useDrainScene } from "../hooks/useDrainScene";
+import { ViewportControls } from "./ViewportControls";
+import { ViewportDetails } from "./ViewportDetails";
 
 interface DrainViewportProps {
   config: DrainConfig;
@@ -9,41 +11,48 @@ interface DrainViewportProps {
 export function DrainViewport({ config }: DrainViewportProps) {
   const controls = useDrainScene(config);
   const { t } = useI18n();
+  const descriptionId = "viewport-keyboard-help";
 
   return (
     <main className="viewport">
       <canvas
         ref={controls.canvasRef}
         aria-label={t("viewport.ariaLabel", { size: config.size })}
+        aria-describedby={`${descriptionId} viewport-interaction-help`}
+        tabIndex={0}
         onPointerDown={controls.onPointerDown}
         onPointerMove={controls.onPointerMove}
         onPointerUp={controls.onPointerUp}
         onPointerCancel={controls.onPointerUp}
+        onLostPointerCapture={controls.onLostPointerCapture}
         onWheel={controls.onWheel}
+        onKeyDown={controls.onKeyDown}
       />
 
-      <div className="viewport-meta">
-        <p className="dimension-display">
-          {config.size} <span>×</span> {config.size}
-          <small>mm</small>
-        </p>
-        <p className="model-detail">
-          H {config.height} mm · {config.cavities} × {config.cavities} ·{" "}
-          {t(`shape.${config.shape}`)}
-        </p>
-      </div>
+      <ViewportDetails config={config} />
+      <ViewportControls
+        isAutoRotating={controls.isAutoRotating}
+        onRotate={controls.rotate}
+        onZoom={controls.zoomBy}
+        onReset={controls.resetView}
+        onTogglePause={controls.toggleAutoRotate}
+      />
 
-      <div className="orientation-mark" aria-hidden="true">
-        <span className="axis axis-x">X</span>
-        <span className="axis axis-y">Y</span>
-        <span className="axis axis-z">Z</span>
-      </div>
-
-      <p className="interaction-hint">
+      <p className="interaction-hint" id="viewport-interaction-help">
         <span>{t("viewport.drag")}</span> {t("viewport.rotate")}
         <i />
         <span>{t("viewport.scroll")}</span> {t("viewport.zoom")}
       </p>
+
+      <span id={descriptionId} className="visually-hidden">
+        {t("viewport.keyboard")}
+      </span>
+
+      {controls.hasWebGlError ? (
+        <p role="alert" className="webgl-fallback">
+          {t("viewport.webglError")}
+        </p>
+      ) : null}
     </main>
   );
 }
