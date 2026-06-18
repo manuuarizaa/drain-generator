@@ -1,6 +1,6 @@
-# Sumidero Playground
+# Drain Playground
 
-Sumidero Playground is a browser-based parametric drain configurator. It lets
+Drain Generator is a browser-based parametric drain configurator. It lets
 users customize a drain cover, inspect the result in an interactive 3D preview,
 and export the generated model as a binary STL file for fabrication or 3D
 printing.
@@ -73,22 +73,6 @@ The individual commands are also available:
 pnpm typecheck
 pnpm test
 pnpm build
-```
-
-## Project Structure
-
-```text
-src/
-├── app/
-│   ├── App.tsx
-│   ├── LanguageSelector.tsx
-│   ├── i18n.tsx
-│   └── styles.css
-├── features/configurator/
-│   ├── components/   # Configurator controls and 3D viewport
-│   ├── domain/       # Configuration, geometry, and STL generation
-│   └── hooks/        # React and Three.js scene integration
-└── main.tsx
 ```
 
 ## How It Works
