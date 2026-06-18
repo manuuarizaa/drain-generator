@@ -1,4 +1,4 @@
-# Drain Playground
+# Drain Generator
 
 Drain Generator is a browser-based parametric drain configurator. It lets
 users customize a drain cover, inspect the result in an interactive 3D preview,
